@@ -1,0 +1,37 @@
+name:                dtd-verifier
+version:             0.1.0.0
+synopsis:            DTD verifier
+-- description:         
+license:             BSD3
+license-file:        LICENSE
+author:              davnils
+maintainer:          davd@localhost
+-- copyright:           
+category:            Language
+build-type:          Simple
+-- extra-source-files:  
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     Automata.DTD, Automata.PDA
+  build-depends:       base >=4.6 && <4.7,
+                       recursion-schemes >=4.0 && <4.1,
+                       regexp-automata >=0.1 && <0.2,
+                       containers >=0.5 && <0.6,
+                       semigroups >=0.12 && <0.13
+  hs-source-dirs:      src
+  build-tools:         alex, happy
+  default-language:    Haskell2010
+
+executable dtd-verify
+  main-is:             Verifier/Driver.hs
+  other-modules:       Verifier.Lexer, Verifier.Parser
+  build-depends:       array >= 0.4,
+                       base >= 4.6,
+                       containers >= 0.5,
+                       mtl,
+                       recursion-schemes >= 3.0,
+                       semigroups >= 0.12
+  hs-source-dirs:      src
+  build-tools:         alex, happy
+  default-language:    Haskell2010

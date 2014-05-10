@@ -1,0 +1,12 @@
+<A>
+  <B>
+    <A>
+      <B><A><C>hello 1</C></A><C>hello A</C></B>
+      <B><A><C>hello 2</C></A><C>hello B</C></B>
+      <B><A><C>hello 3</C></A><C>hello C</C></B>
+      <C>hello 4</C>
+    </A>
+    <C>some text</C>
+    <C>some more text</C>
+  </B>
+</A>

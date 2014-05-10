@@ -1,0 +1,38 @@
+<PCS>
+    <PC>
+        <MODEL>4560</MODEL>
+        <PRICE>$2295</PRICE>
+        <PROCESSOR>
+            <MANF>Intel</MANF>
+            <MODEL>Pentium</MODEL>
+            <SPEED>800MHz</SPEED>
+        </PROCESSOR>
+        <RAM>256</RAM>
+        <DISK><HARDDISK>
+            <MANF>Maxtor</MANF>
+            <MODEL>Diamond</MODEL>
+            <SIZE>30.0Gb</SIZE>
+        </HARDDISK></DISK>
+        <DISK><CD>
+            <SPEED>32x</SPEED>
+        </CD></DISK>
+    </PC>
+    <PC>
+        <MODEL>R60</MODEL>
+        <PRICE>$1295</PRICE>
+        <PROCESSOR>
+            <MANF>Intel</MANF>
+            <MODEL>T5600</MODEL>
+            <SPEED>1.8GHz</SPEED>
+        </PROCESSOR>
+        <RAM>2.0 Gb</RAM>
+        <DISK><HARDDISK>
+            <MANF>Maxtor</MANF>
+            <MODEL>Diamond</MODEL>
+            <SIZE>120.0Gb</SIZE>
+        </HARDDISK></DISK>
+        <DISK><DVD>
+            <SPEED>52x</SPEED>
+        </DVD></DISK>
+    </PC>
+</PCS>

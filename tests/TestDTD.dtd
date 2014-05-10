@@ -1,0 +1,5 @@
+<!DOCTYPE TestDTD [
+    <!ELEMENT A (B*, (C | B)+)>
+    <!ELEMENT B (A, C+)>
+    <!ELEMENT C (B*, \#PCDATA)>
+]>
