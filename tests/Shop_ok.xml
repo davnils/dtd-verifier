@@ -1,0 +1,13 @@
+<CART>
+  <ITEM>
+  <COUNT>2</COUNT>
+  <FROZEN>-12 degrees</FROZEN>
+  <DESC>bananas</DESC>
+  </ITEM>
+
+  <ITEM>
+  <COUNT>42</COUNT>
+  <NORMAL>8 degrees</NORMAL>
+  <DESC>bread</DESC>
+  </ITEM>
+</CART>
