@@ -4,26 +4,20 @@ import           Automata.CFG
 import           Automata.DTD
 import           Automata.PDA
 import           Control.Monad (when)
-import           Data.Functor.Foldable
-import qualified Data.Map as M
+import           Data.Functor.Foldable (Fix(..))
 import           Data.Monoid ((<>))
-import qualified Data.Set as S
 import           System.Environment (getArgs)
+import           System.Exit (exitFailure)
 import           Verifier.Lexer
 import           Verifier.Parser
 
 main :: IO ()
 main = do
-  [f1, f2] <- getArgs
+  args <- getArgs
+  when (length args /= 2) $ putStrLn "./dtd-verify <spec> <input>" >> exitFailure
+  [spec, input] <- mapM readFile args
 
-  tokens <- fmap alexScanTokens (readFile f1)
-  putStrLn $ "Parsed tokens: " <> show tokens
+  let cfg = dtdToCfg . Fix . parseDTD . map fst $ alexScanTokens spec
+      result = simulate cfg input
 
-  let cfg = dtdToCfg . Fix . parseDTD . map fst $ tokens
-
-  putStrLn "Create CFG"
-  print cfg
-
-  putStrLn "Running simulation"
-  input <- readFile f2
-  simulate cfg input >>= print
+  print $ if result then "Valid" else "Invalid"

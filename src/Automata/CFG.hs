@@ -32,24 +32,24 @@ show'' (Left t) = show t
 show'' (Right t) = t
 
 instance Show CFG where
-  show (CFG prods) = unlines (concat $ map show' prods)
+  show (CFG prods) = unlines $ concatMap show' prods
 
 dtdToCfg :: DocAST -> CFG
 dtdToCfg (Fix (ADocument _ entries)) = CFG prods
   where
-  prods = concat $ map (fst . convert) entries
+  prods = concatMap (fst . convert) entries
   convert :: DocAST -> ([Production], TerminalList)
   convert (Fix (AEntry name opts)) = (prods, [])
     where
-    prods = [(name, [begin <> list <> end])] <> (concat $ map fst subResult)
-    begin = map Left $ (T '<') : map T name <> [T '>']
-    end   = map Left $ (T '<') : (T '/')  : map T name <> [T '>']
-    list = concat $ map snd $ subResult
+    prods = [(name, [begin <> list <> end])] <> concatMap fst subResult
+    begin = map Left $ [T '<'] <> map T name <> [T '>']
+    end   = map Left $ [T '<'] <> [T '/']  <> map T name <> [T '>']
+    list = concatMap snd subResult
     subResult = map convert opts
 
   convert (Fix (AReference name)) = ([], [Right name])
 
-  convert (Fix (AData)) = ([], [Left DataSequence])
+  convert (Fix AData) = ([], [Left DataSequence])
 
   -- option handled as multiple production bodies.
   convert (Fix (AOption t1 t2)) = (p1 <> p2 <> [this], [Right thisName])
