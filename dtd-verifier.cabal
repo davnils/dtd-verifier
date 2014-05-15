@@ -13,7 +13,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Automata.DTD, Automata.PDA
+  exposed-modules:     Automata.CFG, Automata.DTD, Automata.PDA
   build-depends:       base >=4.6 && <4.7,
                        recursion-schemes >=4.0 && <4.1,
                        regexp-automata >=0.1 && <0.2,

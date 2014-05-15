@@ -12,8 +12,8 @@ data AST t
   = ADocument AID [t]
   | AEntry AID [t]
   | AReference AID
-  | AOption AID AID
-  | ALeastZero AID
-  | ALeastOne AID
+  | AOption t t
+  | ALeastZero t
+  | ALeastOne t
   | AData
   deriving (Eq, Functor, Show)

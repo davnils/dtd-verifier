@@ -12,6 +12,7 @@ import Verifier.Lexer
 %error { parserError }
 
 %left ','
+%left '|'
 
 %token 
   '<'                           { TLeftBracket              }
@@ -44,17 +45,24 @@ IDLiteral
   | 'DOCTYPE'                       { "DOCTYPE" }
 
 Entries
-  : '<' '!' 'ELEMENT' IDLiteral '(' EntryBody ')' '>' Entries
+  : '<' '!' 'ELEMENT' IDLiteral '(' EntryBodyList ')' '>' Entries
                                     { Fix (AEntry $4 $6) : $9 }
   |                                 { [] }
 
+EntryBodyList
+  : EntryBody ',' EntryBodyList     { $1 : $3           }
+  | EntryBody                       { [$1]              }
+
+ConcreteEntry
+  : id                              { Fix $ AReference $1       }
+  | '(' EntryBody ')'               { $2       }
+
 EntryBody
-  : EntryBody ',' EntryBody         {                $1  ++ $3           }
-  | id                              { return . Fix $ AReference $1       }
-  | id '|' id                       { return . Fix $ AOption $1 $3       }
-  | id '*'                          { return . Fix $ ALeastZero $1       }
-  | id '+'                          { return . Fix $ ALeastOne  $1       }
-  | 'PCDATA'                        { return . Fix $ AData               }
+  : id                              { Fix $ AReference $1       }
+  | ConcreteEntry '|' EntryBody     { Fix $ AOption    $1 $3    }
+  | ConcreteEntry '*'               { Fix $ ALeastZero $1       }
+  | ConcreteEntry '+'               { Fix $ ALeastOne  $1       }
+  | 'PCDATA'                        { Fix $ AData               }
 
 {
 parserError :: [Token] -> a

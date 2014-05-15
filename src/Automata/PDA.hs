@@ -1,94 +1,46 @@
 module Automata.PDA
 where
 
+import           Automata.CFG
 import           Automata.DTD
 import           Data.Functor.Foldable (cata)
 import qualified Data.Map as M
-import           Data.Maybe (fromMaybe)
+import           Data.Maybe (fromJust)
 import           Data.Semigroup ((<>), Semigroup)
 import qualified Data.Set as S
 
-{-
 
-data Epsilon
-  = Epsilon
-  deriving (Eq, Ord, Show)
+-- Implementation of direct CFG simulation
+-- The simulation progresses by expanding a variable on the stack (non-deterministically)
+-- and matching the corresponding terminals in the input.
+-- Any mismatched symbols terminates the computation.
+-- This continus until one execution path succeeds.
 
-type Symbol = Char
-type TransitionEntry = (Int, Either Epsilon Symbol)
-
-data EpsNFA
-  = EpsNFA
-  {
-    _alphabet     :: S.Set Symbol,
-    _states       :: M.Map TransitionEntry (S.Set Int),
-    _startState   :: Int,
-    _endStates    :: S.Set Int,
-    _size         :: Int
-  }
-  deriving (Eq)
-
-instance Semigroup EpsNFA where
-  e1 <> e2 = EpsNFA (S.union (_alphabet e1) (_alphabet e2))
-                    (trans1 <> trans2)
-                    (_startState e1)
-                    (S.map (+sz) $ _endStates e2)
-                    (_size e1 + _size e2)
-    where
-    trans1  = M.alter (addSingleton sz) (sz - 1, Left Epsilon) $ _states e1
-    trans2  = M.mapKeys (\(idx, sym) -> (idx + sz, sym)) $ M.map (S.map (+sz)) $ _states e2
-    sz      = _size e1
-
-instance Show EpsNFA where
-  show nfa = unlines $ [
-    "digraph finite_state_machine {",
-    "rankdir=LR;",
-    "size=\"10,10\"",
-    "node [shape = doublecircle];" <> renderAccepted <> ";",
-    "node [shape = circle];"] <>
-    map renderEntry (M.toList $ _states nfa) <>
-    ["}"]
-    where
-    renderAccepted                 = concatMap (("q_" <>) . show) (S.toList $ _endStates nfa)
-    renderEntry ((from, sym), end) = unlines . map (output from sym) $ S.toList end
-    output from sym target         = "\"q_" <> show from <> "\" -> " <> "\"q_" <> show target <>
-                                     "\"[ label = \"" <> renderSymbol sym <> "\" ];"
-    renderSymbol (Left Epsilon)    = "empty"
-    renderSymbol (Right sym)       = [sym]
-
-exprToNFA :: S.Set Symbol -> RegAST -> EpsNFA
-exprToNFA st = cata (\e -> alg e st)
-
-alg :: AST EpsNFA -> S.Set Symbol -> EpsNFA
-alg AAny            s = EpsNFA s (connectAll 0 1 s) 0 (S.singleton 1) 2
-alg (AEither e1 e2) _ = either' e1 e2
-alg (AConcat e1 e2) _ = e1 <> e2
-alg (AKleeneStar e) s = kleene e s
-alg (ALeastOne e)   s = e <> kleene e s
-alg (AOption e)     s = either' e (binary [Left Epsilon] s)
-alg (AChar c)       s = binary [Right c] s
-
-connectAll s1 s2      = S.fold (\a m -> M.insert (s1, Right a) (S.singleton s2) m) M.empty
-binary list sym       = EpsNFA sym
-                          (M.fromList $ map (\elem -> ((0, elem), S.singleton 1)) list)
-                          0 (S.singleton 1) 2
-
-either' e1 e2         = tie $ single <> e1 <> e2 <> single
+-- The (SINGLE) start production is assumed to be (head prods)
+simulate :: CFG -> String -> IO Bool
+simulate (CFG prods) input = do
+  putStrLn $ "contents of start prod: " <> show startProd
+  putStrLn $ "contents of start inpu: " <> show input
+  return $ go startProd input
   where
-  tie (EpsNFA alpha states start accept sz) =
-    (\m -> EpsNFA alpha m start accept sz) $
-    M.alter (addSingleton $ sz - 1) (_size e1, Left Epsilon) $     -- add e1 -> single2
-    M.alter (addSingleton firstLower) (0, Left Epsilon) $          -- add single1 -> e2
-    M.adjust (S.delete firstLower) (_size e1, Left Epsilon) states -- remove e1 -> e2
-  firstLower = _size e1 + 1
+  startProd = head . snd $ head prods
 
-kleene e s            = tie $ single <> e <> single
-  where
-  tie (EpsNFA alpha states start accept sz) =
-    (\m -> EpsNFA alpha m start accept sz) $
-    M.alter (addSingleton 1) (sz - 2, Left Epsilon) $              -- add prev final -> single2
-    M.alter (addSingleton $ sz - 1) (0, Left Epsilon) states       -- add single1 -> single2
+  -- parse data if available (including spaces etc)
+  go (Left DataSequence:xs) cs = go xs $ dropWhile (/= '<') cs
 
-single = EpsNFA S.empty M.empty 0 (S.singleton 0) 1
-addSingleton target = Just . S.union (S.singleton target) . fromMaybe S.empty
--}
+  -- ignore space and newline
+  go cs (' ':xs) = go cs xs
+  go cs ('\n':xs) = go cs xs
+  go cs ('\t':xs) = go cs xs
+
+  go (Left Epsilon:xs) cs = go xs cs
+  go (Left (T sym):xs) (c:cs) = if sym == c then go xs cs else False
+
+  go [] [] = True
+  go [] _ = False
+  go _ [] = False
+
+  -- survey all expansions, push onto stack
+  go (Right prod:xs) cs = or $ map (\cand -> go (cand <> xs) cs) cands
+    where
+    cands = concat $ map snd $ filter (\(h, _) -> h == prod) prods

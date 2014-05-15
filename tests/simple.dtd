@@ -1,0 +1,3 @@
+<!DOCTYPE Simple [
+<!ELEMENT FIELD (\#PCDATA)>
+]>
