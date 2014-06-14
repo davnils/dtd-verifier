@@ -24,9 +24,10 @@ tokens :-
   "|"                           {tag' TOption                   }
   "*"                           {tag' TStar                     }
   "+"                           {tag' TPlus                     }
-  "DOCTYPE"                     {tag' TDocType                     }
+  "?"                           {tag' TOptional                 }
+  "DOCTYPE"                     {tag' TDocType                  }
   "\#PCDATA"                    {tag' TData                     }
-  "ELEMENT"                     {tag' TElement                     }
+  "ELEMENT"                     {tag' TElement                  }
 
   $alpha+                       {tag $ TID                      }
 
@@ -45,6 +46,7 @@ data Token
  | TOption
  | TStar
  | TPlus
+ | TOptional
  | TDocType
  | TData
  | TElement

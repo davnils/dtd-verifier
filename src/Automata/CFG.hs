@@ -72,3 +72,10 @@ dtdToCfg (Fix (ADocument _ entries)) = CFG prods
     (p1, [Right c1]) = convert t
     thisName         = "LeastZero" <> c1
     this             = (thisName, [[Left Epsilon], [Right c1, Right thisName]])
+
+  -- ? handled as optionally empty
+  convert (Fix (AOptional t)) = (p1 <> [this], [Right thisName])
+    where
+    (p1, [Right c1]) = convert t
+    thisName         = "Optional" <> c1
+    this             = (thisName, [[Left Epsilon], [Right c1]])

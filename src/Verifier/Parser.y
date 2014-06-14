@@ -27,6 +27,7 @@ import Verifier.Lexer
   '|'                           { TOption                   }
   '*'                           { TStar                     }
   '+'                           { TPlus                     }
+  '?'                           { TOptional                 }
   'DOCTYPE'                     { TDocType                  }
   'PCDATA'                      { TData                     }
   'ELEMENT'                     { TElement                  }
@@ -62,6 +63,7 @@ EntryBody
   | ConcreteEntry '|' EntryBody     { Fix $ AOption    $1 $3    }
   | ConcreteEntry '*'               { Fix $ ALeastZero $1       }
   | ConcreteEntry '+'               { Fix $ ALeastOne  $1       }
+  | ConcreteEntry '?'               { Fix $ AOptional  $1       }
   | 'PCDATA'                        { Fix $ AData               }
 
 {

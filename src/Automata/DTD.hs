@@ -15,5 +15,6 @@ data AST t
   | AOption t t
   | ALeastZero t
   | ALeastOne t
+  | AOptional t
   | AData
   deriving (Eq, Functor, Show)
